@@ -17,6 +17,7 @@ float x, y, z;
 float coz;
 
 int xp, yp;
+int idx;
 
 float calculateX(int i, int j, int k)
 {
@@ -41,10 +42,19 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, int ch)
     y = calculateY(cubeX, cubeY, cubeZ);
     z = calculateZ(cubeX, cubeY, cubeZ) + distanceFromCam;
 
-    coz = 1/z;
-    xp = (int)(width/2 + K1 * coz * x * 2);
-    yp = (int)(height/2 + K1 * coz * y);
+    coz = 1 / z;
+    xp = (int)(width / 2 + K1 * coz * x * 2);
+    yp = (int)(height / 2 + K1 * coz * y);
 
+    idx = xp + yp + width;
+    if (idx >= 0 && idx < width * height)
+    {
+        if (coz > zBuffer[idx])
+        {
+            zBuffer[idx] = coz;
+            buffer[idx] = ch;
+        }
+    }
 }
 
 int main()
@@ -62,6 +72,14 @@ int main()
                 calculateForSurface(cubeX, cubeY, -cubeWidth, '#');
             }
         }
+        printf("\x1b[H");
+        for (int k = 0; k < width * height; k++)
+        {
+            putchar(k % width ? buffer[k] : 10);
+        }
+
+        A += 0.005;
+        B += 0.005;
     }
     return 0;
 }
